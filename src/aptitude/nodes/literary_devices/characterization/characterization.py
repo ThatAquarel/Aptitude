@@ -1,5 +1,5 @@
-from aptitude.literary_devices.metaphor.metaphor import Metaphor
-from aptitude.literary_devices.simile.simile import Simile
+from aptitude.nodes.literary_devices.metaphor.metaphor import Metaphor
+from aptitude.nodes.literary_devices.simile.simile import Simile
 from aptitude.pipeline.parser import Parser
 
 

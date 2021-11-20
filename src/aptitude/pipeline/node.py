@@ -6,17 +6,15 @@ from aptitude.util.types import Documents, PipelineData
 
 class NodeType(Enum):
     GENERIC = 0
-    PARSER = 1
+    GENERATOR = 1
+    PARSER = 2
 
 
 class Node(ABC):
     _docs: Documents
 
-    def __init__(self, docs: Documents):
-        self._docs = docs
-
     @abstractmethod
-    def process(self, data: PipelineData) -> None:
+    def process(self, data: PipelineData) -> object:
         raise NotImplementedError("process() of Node is not implemented")
 
     @staticmethod
@@ -30,3 +28,4 @@ class Node(ABC):
 
 
 Nodes = list[Node]
+NodeClasses = list[Node.__class__]

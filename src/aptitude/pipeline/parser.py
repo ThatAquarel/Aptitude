@@ -1,20 +1,19 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic
 
-from aptitude.util.types import Documents
+from aptitude.pipeline.node import Node, NodeType
 
 T = TypeVar("T")
 
 
-class LiteraryDevice(ABC, Generic[T]):
-    _docs: Documents
+class Parser(Node, ABC, Generic[T]):
     _output_data: T
 
-    def __init__(self, docs: Documents):
-        self._docs = docs
+    def process(self, data):
+        self.parse(data)
 
     @abstractmethod
-    def parse(self):
+    def parse(self, data):
         raise NotImplementedError("parse() of LiteraryDevice is not implemented")
 
     @staticmethod
@@ -22,8 +21,9 @@ class LiteraryDevice(ABC, Generic[T]):
     def get_dependencies() -> list[type]:
         raise NotImplementedError("get_dependencies() of LiteraryDevice is not implemented")
 
+    @staticmethod
+    def get_node_type() -> NodeType:
+        return NodeType.PARSER
+
     def get_output_data(self) -> T:
         return self._output_data
-
-
-LiteraryDevices = list[LiteraryDevice]

@@ -1,10 +1,10 @@
-from aptitude.literary_devices.literary_device import LiteraryDevice
+from aptitude.pipeline.parser import Parser
 
 
-class Simile(LiteraryDevice):
+class Simile(Parser):
     @staticmethod
     def get_dependencies() -> list[type]:
         return []
 
-    def parse(self):
+    def parse(self, data):
         pass

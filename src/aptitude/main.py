@@ -5,17 +5,17 @@ from graphlib import TopologicalSorter
 import spacy
 
 from aptitude.literary_devices.characterization.characterization import Characterization
-from aptitude.literary_devices.literary_device import LiteraryDevices
 from aptitude.literary_devices.metaphor.metaphor import Metaphor
 from aptitude.literary_devices.simile.simile import Simile
 from aptitude.literary_devices.symbolism.symbolism import Symbolism
+from aptitude.pipeline.node import Nodes
 from aptitude.util.text import Text
 from aptitude.util.types import Documents
 
 
 class Aptitude:
     _documents: Documents
-    _literary_devices: LiteraryDevices
+    _nodes: Nodes
 
     def __init__(self):
         nlp = spacy.load("en_core_web_trf")
@@ -26,9 +26,9 @@ class Aptitude:
         for doc in nlp.pipe(sentences, n_process=multiprocessing.cpu_count()):
             self._documents.append(doc)
 
-        self._literary_devices = self.instantiate_literary_devices()
+        self._nodes = self.instantiate_nodes()
 
-    def instantiate_literary_devices(self) -> LiteraryDevices:
+    def instantiate_nodes(self) -> Nodes:
         classes = {
             class_.__name__: class_
             for class_ in [
@@ -40,9 +40,9 @@ class Aptitude:
         }
 
         dependencies = {class_.__name__: [] for class_ in classes.values()}
-        for literary_device in classes.values():
-            for dependency in literary_device.get_dependencies():
-                dependencies[dependency.__name__].append(literary_device.__name__)
+        for node in classes.values():
+            for dependency in node.get_dependencies():
+                dependencies[dependency.__name__].append(node.__name__)
 
         names = {k: set(v) for k, v in dependencies.items()}
         sorted_names = list(TopologicalSorter(names).static_order())[::-1]

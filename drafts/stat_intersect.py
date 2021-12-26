@@ -17,14 +17,23 @@ SET_VARIATION = 3
 # }
 # Exception: No two character intersection
 
-sets = {
-    "cd": 40,
-    "abd": 40,
-    "bd": 40
-}
+# sets = {
+#     "cd": 40,
+#     "abd": 40,
+#     "bd": 40
+# }
+# bd
+
+# sets = {
+#     "d": 40,
+#     "abd": 40,
+#     "bd": 40
+# }
+# bd
 
 texts = [string for string in sets.keys()]
-global_counts = [count for count in sets.values()]
+global_counts = np.array([count for count in sets.values()], dtype=np.float32)
+weighted_average_length = np.average(np.char.str_len(texts), weights=global_counts)
 
 all_chars = [char for string in texts for char in string]
 unique_chars = np.unique(all_chars)
@@ -45,12 +54,16 @@ char_combinations = np.char.add(x, y).reshape(-1)
 char_combinations_probabilities = get_combination_probabilities(char_combinations)
 probable_indices = np.argpartition(char_combinations_probabilities, -SET_VARIATION)[-SET_VARIATION:]
 
-# char_combinations_probabilities = char_combinations_probabilities[probable_indices]
-# if np.all(char_combinations_probabilities == char_combinations_probabilities[0]):
-#     raise Exception("No two character intersection")
-
 probable_char_combinations = char_combinations[probable_indices]
+probable_char_probabilities = char_combinations_probabilities[probable_indices]
 probable_separated_chars = [[char for char in string] for string in probable_char_combinations]
+
+if np.all(probable_char_probabilities == probable_char_probabilities[0]):
+    raise Exception("No two character intersection")
+
+if weighted_average_length < 3:
+    print(probable_char_combinations[np.argmax(probable_char_probabilities)])
+    exit()
 
 # stage 2
 intersect_combinations = []

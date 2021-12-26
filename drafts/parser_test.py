@@ -31,7 +31,7 @@ pattern = [
     }
 ]
 
-matcher.add("bingyu_dobj_path", [pattern])
+matcher.add("test", [pattern])
 for doc in docs:
     matches = matcher(doc)
     if len(matches) == 0:

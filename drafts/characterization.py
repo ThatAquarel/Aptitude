@@ -43,7 +43,7 @@ pattern = [
         "REL_OP": ">>",
         "RIGHT_ID": "clause_complement",
         "RIGHT_ATTRS": {'DEP': 'xcomp'}
-    },
+    }
 ]
 matcher.add("complements", [pattern])
 
@@ -57,5 +57,5 @@ for doc in docs:
     for match in token_ids:
         token = doc[match]
 
-        if token.text != "Alice" and token.pos_ != "VERB":
-            print(token)
+        # if token.text != "Alice" and token.pos_ != "VERB":
+        print(token)

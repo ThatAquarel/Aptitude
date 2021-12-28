@@ -82,12 +82,9 @@ import numpy as np
 #     return {intersect_combinations[0]: values[0]}
 
 
-def get_probable_string(probabilistic_intersection: dict[str, float]) -> str:
-    texts = [i for i in probabilistic_intersection.keys()]
-    probabilities = [i for i in probabilistic_intersection.values()]
-    index = np.argmax(probabilities)
-
-    return texts[index]
+def get_probable_strings(probabilistic_intersection: dict[str, float], str_count=1) -> list[str]:
+    texts = list(probabilistic_intersection.keys())
+    return texts[:str_count]
 
 
 def get_probabilistic_intersection(sets: dict[str, int], length_bias=2.0, count_bias=1.0):
@@ -128,6 +125,19 @@ def get_probabilistic_intersection(sets: dict[str, int], length_bias=2.0, count_
         zip(unique_substr, base_probability)
     }
     return dict(sorted(ret.items(), key=lambda item: item[1], reverse=True))
+
+
+def get_full_string(sets: dict[str, int], probabilities: dict[str, float]):
+    full_strings = list(sets.keys())
+    all_strings = list(probabilities.keys())
+
+    mask = np.array([i in full_strings for i in all_strings])
+    keys = np.array(all_strings)[mask]
+
+    return {
+        key: probabilities[key]
+        for key in keys
+    }
 
 
 def remove_single_chars(dictionary):
@@ -258,8 +268,9 @@ def main():
             for i, key in enumerate(keys_)
         }
 
-        a = get_probabilistic_intersection(group_, length_bias=1.75, count_bias=1)
-        print(f"{group}\n{leading_char}{get_probable_string(a)}\n")
+        probabilities = get_probabilistic_intersection(group_, length_bias=1.75, count_bias=1)
+        a = get_full_string(group_, probabilities)
+        print(f"{group}\n{[leading_char + i for i in get_probable_strings(a, str_count=2)]}\n")
 
 
 if __name__ == '__main__':

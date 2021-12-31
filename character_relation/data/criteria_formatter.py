@@ -24,7 +24,6 @@ positive = [
     "ally",
     "associate",
     "colleague",
-    "friend",
     "partner",
     "accessory",
     "accomplice",
@@ -258,7 +257,6 @@ indifferent = [
     "unconcerned",
     "uninvolved",
     "unresponsive",
-    "unsympathetic",
     "cold",
     "cool",
     "dispassionate",
@@ -275,7 +273,6 @@ indifferent = [
     "silent",
     "stoical",
     "supercilious",
-    "superior",
     "unaroused",
     "unbiased",
     "uncommunicative",
@@ -288,45 +285,44 @@ indifferent = [
 
 
 def main():
-    # nlp = spacy.load("en_core_web_md")
-    # criteria = np.array([
-    #     [introvert, extrovert],
-    #     [positive, negative],
-    #     [superior, inferior],
-    #     [personal, professional],
-    #     [emotional, indifferent]
-    # ], dtype=list)
-    #
-    # criteria_vec = np.empty(criteria.shape, dtype=list)
-    # for i, x in enumerate(criteria):
-    #     for j, y in enumerate(x):
-    #         criteria_vec[i, j] = [i.vector for i in nlp.pipe(y) if i.has_vector]
-    #
-    # len_c = [len(i) for i in criteria.reshape(-1)]
-    # len_cv = [len(i) for i in criteria_vec.reshape(-1)]
-    # if len_c != len_cv:
-    #     raise Exception("Some words of criteria don't have word vectors")
-    #
-    # with open("criteria_vectors", "wb") as file:
-    #     pickle.dump(criteria_vec, file)
+    import spacy
+    import pickle
+    import numpy as np
 
-    criteria = [
+    criteria = np.array([
         [extrovert, introvert],
         [positive, negative],
         [superior, inferior],
         [personal, professional],
         [emotional, indifferent]
-    ]
+    ], dtype=list)
 
-    for criterion in criteria:
-        print("{")
-        for i, a in enumerate(criterion):
-            for b in a:
-                c = 1
-                if i == 1:
-                    c = -1
-                print(f"\"{b}\":{c},")
-        print("}")
+    words = [word for word_set in np.reshape(criteria, -1) for word in word_set]
+    softmax_shape = (len(words), len(criteria), 2)
+    one_hot_softmax = np.zeros(softmax_shape, dtype=np.float32)
+    indices = np.zeros((softmax_shape[0], 2), dtype=np.float32)
+
+    idx = 0
+    for i, criterion in enumerate(criteria):
+        for j, word_set in enumerate(criterion):
+            for _ in word_set:
+                one_hot_softmax[idx, i, j] = 1
+                indices[idx] = [i, j]
+                idx += 1
+
+    nlp = spacy.load("en_core_web_md")
+    docs = list(nlp.pipe(words))
+    vectors = np.array([doc.vector for doc in docs])
+
+    data = {
+        "words": words,
+        "one_hot_softmax": one_hot_softmax,
+        "indices": indices,
+        "vectors": vectors
+    }
+
+    with open("criteria_data", "wb") as file:
+        pickle.dump(data, file)
 
 
 if __name__ == '__main__':

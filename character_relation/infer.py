@@ -1,21 +1,14 @@
-import spacy
-import numpy as np
-
 from tensorflow import keras
 
-nlp = spacy.load("en_core_web_md")
-model = keras.models.load_model("character_relation_model")
+from character_relation.model import CharacterRelationModel
 
+model = CharacterRelationModel()
 
-def preprocess(text: str):
-    doc = nlp(text)
-    vectors = [token.vector for token in doc]
-    x = np.zeros((1, 32, 300))
-    x[:, np.arange(len(vectors)), :] = vectors
+keras_model = keras.models.load_model("character_relation_model")
+y = keras_model.predict(model.preprocess([
+    "My boss at work is extremely toxic, he insults everyone.",
+    "He's my accomplice",
+    "He's my rival in a swimming competition"
+]))
 
-    return x
-
-
-model.predict(preprocess("My boss at work is extremely toxic, he insults everyone."))
-model.predict(preprocess("He's my accomplice"))
-model.predict(preprocess("He's my rival in a swimming competition"))
+print(y)

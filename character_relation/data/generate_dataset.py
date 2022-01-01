@@ -4,7 +4,7 @@ import numpy as np
 
 DATA_QTY = 100
 
-nlp = spacy.load("en_core_web_md")
+nlp = spacy.load("en_core_web_lg")
 
 with open("words.txt", "r") as file:
     text = file.read()

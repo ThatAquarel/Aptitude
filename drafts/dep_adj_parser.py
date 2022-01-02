@@ -8,27 +8,42 @@ doc = nlp("他在这雪谷幽居，至此时已五年有余，从一个孩子长
 
 tokens = np.array([token for token in doc])
 mask_0 = [token.is_punct for token in tokens]
-mask_1 = [token.pos_ in ['DET', 'ADP'] for token in tokens]
-mask = np.invert(np.bitwise_or(mask_0, mask_1))
-tokens = tokens[mask]
+# mask_1 = [token.pos_ in ['DET', 'ADP'] for token in tokens]
+# mask = np.invert(np.bitwise_or(mask_0, mask_1))
+tokens = tokens[np.invert(mask_0)]
 
 root_deps = [list(token.ancestors) for token in tokens]
 root_deps_len = np.array([len(dep) for dep in root_deps])
 
-max_root_deps_len = np.amax(root_deps_len)
-indices = []
-for i in range(max_root_deps_len):
-    j = i + 1
+root_deps_0 = [dep[0] if dep else None for dep in root_deps]
+unique_root_deps, inverse_idx = np.unique(root_deps_0, return_inverse=True)
 
-    a = root_deps_len[:-2] == j
-    b = root_deps_len[1:-1] == i
-    c = root_deps_len[2:] == j
+groups = [[] for _ in range(len(unique_root_deps))]
+for i, token in zip(inverse_idx, tokens):
+    groups[i].append(token)
+len_groups = np.array([len(group) for group in groups])
+groups = np.delete(np.array(groups, dtype=list), np.where(len_groups == 1))
 
-    indices.extend(np.argwhere(a & b & c).reshape(-1).tolist())
+# group some sibling tokens that are directly next to each other
+groups_idx = [[token.i for token in group] for group in groups]
+direct_siblings_groups = [[] for _ in range(len(groups))]
+for i, tokens_idx in enumerate(groups_idx):
+    a = np.subtract(tokens_idx, np.arange(len(tokens_idx)))
+    unique_a, inv_idx_a = np.unique(a, return_inverse=True)
+    # if unique_a.shape[0] == 1:
+    #     continue
+    direct_siblings_groups[i] = [[] for _ in range(len(unique_a))]
+    for k, j in enumerate(inv_idx_a):
+        direct_siblings_groups[i][j].append(groups[i][k])
+direct_siblings_groups = [group for group in direct_siblings_groups if group]
+clean_direct_siblings_groups = [group for group in direct_siblings_groups if len(group) != 1]
 
-indices = np.array(indices)
-subj = tokens[indices]
-conj = tokens[indices + 1]
-objc = tokens[indices + 2]
+# get the current unique ancestors and remove them from the token groups
+# ancestors = []
+# for group in clean_direct_siblings_groups:
+#     for token_group in group:
+#         # for token in token_group:
+#         ancestors.extend(list(token_group[0].ancestors))
+# ancestors = np.unique(ancestors)
 
-print(np.concatenate((subj[:, None], conj[:, None], objc[:, None]), axis=1))
+print()

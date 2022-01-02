@@ -3,8 +3,8 @@ import numpy as np
 import tensorflow as tf
 
 from character_relation.config import MAX_TOKEN_LENGTH
-from character_relation.data.words import criteria_words as criteria_words_
-from character_relation.data.words import filler_words as filler_words_
+from character_relation.data.words_en import criteria_words as criteria_words_
+from character_relation.data.words_en import filler_words as filler_words_
 from character_relation.model import CharacterRelationModel
 
 SENTENCES_PER_TYPE = 2

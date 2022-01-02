@@ -1,5 +1,6 @@
 import pickle
 import numpy as np
+import tensorflow as tf
 
 from character_relation.config import MAX_TOKEN_LENGTH
 from character_relation.data.words import criteria_words as criteria_words_
@@ -40,6 +41,7 @@ def main():
 
     character_relation_model = CharacterRelationModel()
     x = character_relation_model.preprocess(sentences)
+    y = tf.nn.softmax(y, axis=-1).numpy()
 
     data = {
         'x': x,

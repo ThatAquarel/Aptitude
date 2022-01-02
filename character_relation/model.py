@@ -23,7 +23,10 @@ class CharacterRelationModel:
 
     def preprocess(self, texts: list[str]) -> np.ndarray:
         docs = list(self._nlp.pipe(texts))
-        doc_vectors = [[token.vector for token in doc] for doc in docs]
+        doc_vectors = [
+            [token.vector for token in doc if token.is_alpha][:MAX_TOKEN_LENGTH]
+            for doc in docs
+        ]
 
         inputs = np.zeros((len(docs), MAX_TOKEN_LENGTH, SPACY_WORD_VEC_SIZE))
         for i, vectors in enumerate(doc_vectors):
@@ -42,10 +45,10 @@ class CharacterRelationModel:
         # (*, 10)      Softmax dim (*, 5, 2)
 
         return keras.Sequential([
-            layers.Input(shape=(MAX_TOKEN_LENGTH, 300,)),
+            layers.Input(shape=(MAX_TOKEN_LENGTH, SPACY_WORD_VEC_SIZE,)),
             layers.Masking(),
-            layers.LSTM(300),
-            layers.Dense(150, activation='relu'),
+            layers.LSTM(SPACY_WORD_VEC_SIZE),
+            layers.Dense(SPACY_WORD_VEC_SIZE / 2, activation='relu'),
             layers.Dense(10),
             Softmax2D()
         ])

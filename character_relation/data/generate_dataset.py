@@ -11,15 +11,22 @@ words = importlib.import_module(f"character_relation.data.words_{LANGUAGE}")
 criteria_words_ = words.criteria_words
 filler_words_ = words.filler_words
 
-SENTENCES_PER_TYPE = 8
-SHUFFLE_QTY = 3
+SENTENCES_PER_TYPE = 2
+SHUFFLE_QTY = 1
 
 
 def main():
-    permutations = np.meshgrid(*[np.arange(3) for _ in range(5)])
-    permutations = np.array(permutations).reshape((5, -1)).T
-    permutations = np.repeat(permutations, SENTENCES_PER_TYPE, axis=0)
-    permutations = permutations[:, ::-1]
+    # permutations = np.meshgrid(*[np.arange(3) for _ in range(5)])
+    # permutations = np.array(permutations).reshape((5, -1)).T
+    # permutations = np.repeat(permutations, SENTENCES_PER_TYPE, axis=0)
+    # permutations = permutations[:, ::-1]
+
+    a = np.array(np.arange(5))
+    b = np.zeros((a.size, np.amax(a) + 1))
+    b[np.arange(a.size), a] = 1
+    c = np.concatenate((b, b * 2))
+    permutations = np.repeat(c, 25, axis=0)
+    permutations = permutations.astype(int)
 
     filler_words = np.array(filler_words_)
     criteria_words = np.array(criteria_words_, dtype=list).reshape((5, -1))

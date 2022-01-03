@@ -1,5 +1,7 @@
-MAX_TOKEN_LENGTH = 32
+# LANGUAGE = "en"
+LANGUAGE = "zh"
 
-# SPACY_NLP_MODEL = "en_core_web_md"
-SPACY_NLP_MODEL = "zh_core_web_lg"
+SPACY_NLP_MODEL = f"{LANGUAGE}_core_web_lg"
 SPACY_WORD_VEC_SIZE = 300
+
+MAX_TOKEN_LENGTH = 32

@@ -1,13 +1,17 @@
+import importlib
 import pickle
+
 import numpy as np
 import tensorflow as tf
 
-from character_relation.config import MAX_TOKEN_LENGTH
-from character_relation.data.words_en import criteria_words as criteria_words_
-from character_relation.data.words_en import filler_words as filler_words_
+from character_relation.config import MAX_TOKEN_LENGTH, LANGUAGE
 from character_relation.model import CharacterRelationModel
 
-SENTENCES_PER_TYPE = 2
+words = importlib.import_module(f"character_relation.data.words_{LANGUAGE}")
+criteria_words_ = words.criteria_words
+filler_words_ = words.filler_words
+
+SENTENCES_PER_TYPE = 8
 SHUFFLE_QTY = 3
 
 
@@ -47,7 +51,7 @@ def main():
         'x': x,
         'y': y
     }
-    with open("dataset", "wb") as file:
+    with open(f"dataset_{LANGUAGE}", "wb") as file:
         pickle.dump(data, file)
 
 
